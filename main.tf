@@ -1,21 +1,20 @@
-data "google_compute_instance" "vms" {
-  depends_on = [google_compute_instance_group.example]
-}
 
-data "google_compute_image" "images" {
-  depends_on = [google_compute_instance_group.example]
-}
+resource "google_compute_instance" "example" {
+  name         = "example-vm"
+  machine_type = "n1-standard-1"
+  zone         = "us-central1-a"
 
-resource "google_compute_instance_group" "example" {
-  name        = "example-instance-group"
-  description = "Example instance group"
-  zone        = "us-central1-a"
-}
+  boot_disk {
+    initialize_params {
+      image = "debian-cloud/debian-10"
+    }
+  }
 
-output "virtual_machines" {
-  value = data.google_compute_instance.vms.*.self_link
-}
+  network_interface {
+    network = "default"
+  }
 
-output "virtual_machine_images" {
-  value = data.google_compute_image.images.*.self_link
+  metadata = {
+    ssh-keys = "your-ssh-public-key"
+  }
 }
